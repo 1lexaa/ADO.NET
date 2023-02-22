@@ -1,0 +1,2 @@
+﻿SELECT REPLACE(Id, SUBSTRING(CONVERT(VARCHAR(70), Id), 6, 26)  , '...'), Name
+FROM Departments
