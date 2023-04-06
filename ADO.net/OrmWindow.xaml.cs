@@ -1,37 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace ADO.net
 {
-    public ObservableCollection<Entity.Department> Departments { get; set; }  // Getting data from the department class.
-    public ObservableCollection<Entity.Product> Product { get; set; }  // Getting data from the product class.
-    public ObservableCollection<Entity.Manager> Manager { get; set; }  // Getting data from the manager class.
-
     public partial class OrmWindow : Window
     {
+        private SqlConnection _connection;  // Сonnection type.
+
+        public ObservableCollection<Entity.Department> Departments { get; set; }  // Getting data from the department class.
+        public ObservableCollection<Entity.Product> Product { get; set; }  // Getting data from the product class.
+        public ObservableCollection<Entity.Manager> Manager { get; set; }  // Getting data from the manager class.
+        public ObservableCollection<Entity.Sale> Sale { get; set; }  // Getting data from the sale class.
+
         public OrmWindow()
         {
             InitializeComponent();
+
             Departments = new ObservableCollection<Entity.Department>();
-            Manager = new ObservableCollection<Entity.Manager>();
             Product = new ObservableCollection<Entity.Product>();
+            Manager = new ObservableCollection<Entity.Manager>();
+            Sale = new ObservableCollection<Entity.Sale>();
             DataContext = this;  // {Binding Departments}
             _connection = new SqlConnection(App._connection_string);
         }
-
 
         private void Window_Loaded(object sender, RoutedEventArgs e)  // When loading a window, we pull data from the table.
         {
@@ -48,6 +44,15 @@ namespace ADO.net
 
                 while (reader.Read())
                     Departments.Add(new Entity.Department() { Id = reader.GetGuid(0), Name = reader.GetString(1) });
+
+                reader.Close();
+                #endregion
+                #region Load Product.
+                cmd.CommandText = "SELECT P.* FROM Products as P WHERE P.DeleteData IS NULL";
+                reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                    Product.Add(new Entity.Product(reader));
 
                 reader.Close();
                 #endregion
@@ -71,16 +76,15 @@ namespace ADO.net
 
                 reader.Close();
                 #endregion
-                #region Load Product.
-                cmd.CommandText = "SELECT P.Id, P.Name, P.Price FROM Products as P";
+                #region Load Sale.
+                cmd.CommandText = "SELECT S.* FROM Sales as S";
                 reader = cmd.ExecuteReader();
 
                 while (reader.Read())
-                    Product.Add(new Entity.Product() { Id = reader.GetGuid(0), Name = reader.GetString(1), Price = reader.GetDouble(2) });
+                    Sale.Add(new Entity.Sale(reader));
 
                 reader.Close();
                 #endregion
-
                 cmd.Dispose();
             }
             catch (SqlException ex)
@@ -89,6 +93,37 @@ namespace ADO.net
                 this.Close();
             }
         }
+
+        #region Events click.
+        private void MouseDoubleClick_ListView_Departments(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the department table.
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Department departments)
+                {
+                    CrudDepartment dialog = new CrudDepartment(departments);
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.EditedDepartment is null)  // If delete.
+                        {
+                            Departments.Remove(departments);
+                            MessageBox.Show($"Deleting {departments.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        }
+                        else  // If save.
+                        {
+                            int index = Departments.IndexOf(departments);
+
+                            Departments.Remove(departments);
+                            Departments.Insert(index, departments);
+                            MessageBox.Show($"Update {departments.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+            }
+        }
+
         private void MouseDoubleClick_ListView_Products(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the product table.
         {
             if (sender is ListViewItem item)
@@ -101,8 +136,18 @@ namespace ADO.net
                     {
                         if (dialog.EditProduct is null)  // If delete.
                         {
-                            Product.Remove(product);
-                            MessageBox.Show($"Deleting {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            using SqlCommand cmd = new SqlCommand() { Connection = _connection };
+
+                            cmd.CommandText = "UPDATE Products SET DeleteData = CURRENT_TIMESTAMP WHERE Id = @Id";
+                            cmd.Parameters.AddWithValue("@Id", product.Id);
+
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                Product.Remove(product);
+                                MessageBox.Show($"Deleting {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
 
                         }
                         else  // If save.
@@ -120,9 +165,59 @@ namespace ADO.net
 
         private void MouseDoubleClick_ListView_Manager(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the manager table.
         {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Manager manager)
+                {
+                    CrudManager dialog = new CrudManager(manager) { Owner = this };
 
+                    if (dialog.ShowDialog() == true)
+                    {
+
+                    }
+                }
+            }
         }
-#endregion
+
+        private void MouseDoubleClick_ListView_Sale(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the Sale table.
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Sale sale)
+                {
+                    CrudSale dialog = new CrudSale(sale) { Owner = this };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.EditSale is null)  // If delete.
+                        {
+                            using SqlCommand cmd = new SqlCommand() { Connection = _connection };
+
+                            cmd.CommandText = "UPDATE Sales SET DeleteDt = CURRENT_TIMESTAMP WHERE Id = @Id";
+                            cmd.Parameters.AddWithValue("@Id", sale.Id);
+
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                Sale.Remove(sale);
+                                MessageBox.Show($"Deleting {sale.IdProduct}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
+
+                        }
+                        else  // If save.
+                        {
+                            int index = Sale.IndexOf(sale);
+
+                            Sale.Remove(sale);
+                            Sale.Insert(index, sale);
+                            MessageBox.Show($"Update {sale.IdProduct}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
         #region Events add.
         private void Click_Button_AddDepartment(object sender, RoutedEventArgs e)  // The method allows you to add data to the Departments table.
         {
@@ -178,6 +273,30 @@ namespace ADO.net
         private void Click_Button_AddManager(object sender, RoutedEventArgs e)
         {
 
+        }
+
+
+        private void Click_Button_AddSale(object sender, RoutedEventArgs e)  // The method allows you to add data to the Sales table.
+        {
+            CrudSale dialog = new CrudSale(null!) { Owner = this };
+
+            if (dialog.ShowDialog() == true && dialog.EditSale is not null)
+            {
+                using SqlCommand cmd = new SqlCommand($"INSERT INTO Sales (Id, ProductId, ManagerId, Cnt, SaleDt) VALUES (@Id, @ProductId, @ManagerId, @Cnt, @SaleDt)", _connection);
+                cmd.Parameters.AddWithValue("@Id", dialog.EditSale.Id);
+                cmd.Parameters.AddWithValue("@ManagerId", dialog.EditSale.IdManager);
+                cmd.Parameters.AddWithValue("@ProductId", dialog.EditSale.IdProduct);
+                cmd.Parameters.AddWithValue("@Cnt", dialog.EditSale.Cnt);
+                cmd.Parameters.AddWithValue("@SaleDt", dialog.EditSale.SaleDt);
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    Sale.Add(dialog.EditSale);
+                    MessageBox.Show("Add true");
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message); }
+            }
         }
         #endregion
     }

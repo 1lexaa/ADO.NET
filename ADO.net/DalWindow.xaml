@@ -1,0 +1,49 @@
+﻿<Window x:Class="ADO.net.DalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ADO.net"
+        mc:Ignorable="d"
+         Title="DalWindow" Height="450" Width="1184" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid>
+        <!--Department-->
+        <StackPanel Margin="10,0,645,32">
+            <Label Content="Departments" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ListView Height="334" ItemsSource="{Binding DepartmentsList}" MouseDoubleClick="MouseDoubleClick_ListView_Departments" Width="510" >
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="Control.MouseDoubleClick" Handler ="MouseDoubleClick_ListView_Departments"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Button x:Name="Button_AddDepartment" Content="Add department" Height="21" Click="Button_AddDepartment_Click" Width="510"/>
+        </StackPanel>
+        <!--Manager-->
+        <StackPanel Margin="544,0,111,32">
+            <Label Content="Managers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ListView Height="334" ItemsSource="{Binding ManagersList}" MouseDoubleClick="MouseDoubleClick_ListView_Manager" Width="510" >
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="Control.MouseDoubleClick" Handler ="MouseDoubleClick_ListView_Manager"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="Surname" DisplayMemberBinding="{Binding Surname}"/>
+                        <GridViewColumn Header="Department" DisplayMemberBinding="{Binding Path = MainDep.Name}"/>
+                        <GridViewColumn Header="Sec Department" DisplayMemberBinding="{Binding Path = SecDep.Name}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Button x:Name="Button_AddManager" Content="Add manager" Height="21" Click="Button_AddManager_Click" Width="510"/>
+        </StackPanel>
+    </Grid>
+</Window>

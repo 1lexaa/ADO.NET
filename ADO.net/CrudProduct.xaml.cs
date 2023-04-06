@@ -1,48 +1,57 @@
 ﻿using ADO.net.Entity;
 using System;
+
 using System.Data.SqlClient;
 using System.Windows;
 
 namespace ADO.net
 {
     /// <summary>
-    /// Логика взаимодействия для CrudDepartment.xaml
+    /// Логика взаимодействия для CrudProduct.xaml
     /// </summary>
-    public partial class CrudDepartment : Window
+    public partial class CrudProduct : Window
     {
         private SqlConnection _connection;
 
-        public Entity.Department EditedDepartment { get; private set; }
+        public Entity.Product EditProduct { get; private set; }
 
-        public CrudDepartment(Entity.Department department)
+        public CrudProduct(Entity.Product product)
         {
             InitializeComponent();
 
             _connection = new SqlConnection() { ConnectionString = App._connection_string };
-            this.EditedDepartment = department;
+            this.EditProduct = product;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _connection.Open();
 
-            if (EditedDepartment is null)
-                EditedDepartment = new Department() { Id = Guid.NewGuid() };
+            if (EditProduct is null)
+            {
+                EditProduct = new Product() { Id = Guid.NewGuid() };
+                DeleteButton.IsEnabled = false;
+            }
             else
-                Textbox_Name.Text = EditedDepartment.Name;
+            {
+                TextBox_Name.Text = EditProduct.Name;
+                DeleteButton.IsEnabled = true;
+                TextBox_Price.Text = EditProduct.Price.ToString();
+            }
 
-            Textbox_Id.Text = EditedDepartment.Id.ToString();
+            TextBox_Id.Text = EditProduct.Id.ToString();
         }
 
         private void Click_Button_Save(object sender, RoutedEventArgs e)
         {
-            EditedDepartment.Name = Textbox_Name.Text;
+            EditProduct.Name = TextBox_Name.Text;
+            EditProduct.Price = Convert.ToDouble(TextBox_Price.Text);
             this.DialogResult = true;
         }
 
         private void Click_Button_Delete(object sender, RoutedEventArgs e)
         {
-            EditedDepartment = null!;
+            EditProduct = null!;
             this.DialogResult = true;
         }
 

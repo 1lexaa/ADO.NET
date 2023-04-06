@@ -5,13 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADO.net"
         mc:Ignorable="d"
-        Title="StartWindow" Height="450" Width="800">
+      Title="StartWindow" Height="312" Width="437">
     <Grid Margin="0,0,0,2">
         <!--Main window layout.-->
-        <StackPanel Height="200" VerticalAlignment="Center">
+        <StackPanel>
             <Label x:Name="Label_Header" Content="ADO.NET" FontSize="24" FontWeight="DemiBold" Width="111"/>
             <Button x:Name="Button_Basics" Content="1.Introduction to the basics" Margin="20 10" Padding="15 5" HorizontalAlignment="Center" Click="Click_Button_Basics" Width="363" Height="26"/>
-            <Button x:Name="Button_Orm" Content="2.Orm display" Margin="20 10" Padding="15 5" HorizontalAlignment="Center" Click="Click_Button_Orm" Width="363"/>
+            <Button x:Name="Button_Orm" Content="2.Orm display" Padding="15 5" Click="Click_Button_Orm" Width="363" Height="25"/>
+            <Button Content="3.DAL" Width="363" Height="23" Click="Button_Click" Margin="0,10,0,10"/>
+            <Button Content="4.EF" Click="Button_Click_EF" Height="23" Width="362"/>
         </StackPanel>
     </Grid>
 </Window>

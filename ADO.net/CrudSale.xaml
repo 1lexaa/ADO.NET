@@ -1,0 +1,61 @@
+﻿<Window x:Class="ADO.net.CrudSale"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ADO.net"
+        mc:Ignorable="d"
+        Title="CrudSale" Height="341" Width="533" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="19*"/>
+            <ColumnDefinition Width="70*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36*"/>
+            <RowDefinition Height="38*"/>
+            <RowDefinition Height="44*"/>
+            <RowDefinition Height="39*"/>
+            <RowDefinition Height="38*"/>
+            <RowDefinition Height="130*"/>
+        </Grid.RowDefinitions>
+        <Label Content="Edit data" FontSize="20" FontWeight="Bold" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Height="35" Width="94" Margin="153,0,0,0"/>
+        <Label Content="ID" Margin="28,0,0,0" FontSize="17" FontWeight="Bold" HorizontalAlignment="Left" Width="38" VerticalAlignment="Center" Height="32" Grid.Row="1"/>
+        <TextBox x:Name="TextBox_Id" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="1" TextWrapping="Wrap" Width="378" FontSize="17" Margin="10,5,0,5"/>
+        <Label Content="Product" Margin="28,0,0,0" Grid.Row="2" FontSize="17" FontWeight="Bold" RenderTransformOrigin="1.03,0.505" Height="29" VerticalAlignment="Center" HorizontalAlignment="Left" Width="74"/>
+        <Label Content="Manager" Margin="28,3,2,0" Grid.Row="3" FontSize="17" FontWeight="Bold" RenderTransformOrigin="1.03,0.505" Height="30" VerticalAlignment="Top"/>
+        <Label Content="Count" Margin="28,0,22,0" Grid.Row="4" FontSize="17" FontWeight="Bold" RenderTransformOrigin="1.03,0.505" Height="29" VerticalAlignment="Center"/>
+        <TextBox x:Name="TextBox_Count" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" Width="65" FontSize="17" Height="30" VerticalAlignment="Center" Margin="10,0,0,0"/>
+        <Label Content="Date sale" Margin="181,0,149,0" Grid.Row="4" FontSize="17" FontWeight="Bold" RenderTransformOrigin="1.03,0.505" Height="29" VerticalAlignment="Center" Grid.Column="1"/>
+        <TextBox x:Name="TextBox_SaleDt" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="4" TextWrapping="Wrap" Width="113" FontSize="17" Height="30" VerticalAlignment="Center" Margin="275,0,0,0"/>
+        <Grid Grid.Row="5" Grid.ColumnSpan="2" Margin="8,10,0,17">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="206*"/>
+                <ColumnDefinition Width="250*"/>
+                <ColumnDefinition Width="173*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Save" Margin="0,0,4,83" Click="Click_Button_Save"/>
+            <Button Content="Delete" Margin="5,0,5,83" Click="Click_Button_Delete" Grid.Column="1"/>
+            <Button x:Name="Button_Cancel" Content="Cancel" Margin="3,0,10,83" Click="Click_Button_Cancel" Grid.Column="2"/>
+        </Grid>
+        <ComboBox x:Name="ComboBox_Product" ItemsSource="{Binding Product}" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Center" Width="378" Height="30" Margin="10,0,0,0">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path = Name}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ComboBox x:Name="ComboBox_Manager" ItemsSource="{Binding Manager}" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" Width="378" Height="29" Margin="10,3,0,0">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path = Name}"></TextBlock>
+                        <TextBlock Text="{Binding Path = Surname}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </Grid>
+</Window>
